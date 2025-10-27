@@ -9,7 +9,6 @@ def firstload(efigi1path, efigi2path, sdsspath):
     
     efigi_2 = pd.concat([chunk for chunk in tqdm(pd.read_csv(efigi2path,  dtype={"objId": str}, comment="#", sep=r'\s+', na_values=["none", "-99.99"], chunksize=100), desc='loading')])
 
-
     # merging the 2 efigi files based on the PGC name so that we have both T score and the sdss7 id together
     efigi_final = pd.merge(efigi_1, efigi_2, on="PGC_name", how="inner")
     efigi_final.to_pickle("data/efigi_final.pkl")
@@ -28,5 +27,6 @@ def filter_merge(efigipklpath, sparcfirepklpath):
     sparcfire.rename(columns={'dr7objid': 'objId'}, inplace=True)
     sparcfire = sparcfire[sparcfire["objId"].isin(efigi["objId"])]
     final = pd.merge(efigi, sparcfire, on="objId", how="inner")
+    print(len(final))
 
     return final
