@@ -27,6 +27,21 @@ def filter_merge(efigipklpath, sparcfirepklpath):
     sparcfire.rename(columns={'dr7objid': 'objId'}, inplace=True)
     sparcfire = sparcfire[sparcfire["objId"].isin(efigi["objId"])]
     final = pd.merge(efigi, sparcfire, on="objId", how="inner")
-    print(len(final))
 
-    return final
+    x = final.drop(columns=['T', 'T_inf', 'T_sup', 'objId', 'SpecObjId', 'SDSS_dr8objid', 'GZ_dr8objid', 'objID', 'badBulgeFitFlag', 
+                            'PGC_name', 'name', 'warnings', 'fit_state', 'numArcsGE000', 'numArcsGE010', 'numArcsGE020', 'numArcsGE040', 
+                            'numArcsGE050', 'numArcsGE055', 'numArcsGE060', 'numArcsGE065', 'numArcsGE070', 'numArcsGE075', 'numArcsGE080', 
+                            'numArcsGE085', 'numArcsGE090', 'numArcsGE095', 'numArcsGE100', 'numArcsGE120', 'numArcsGE140', 'numArcsGE160', 
+                            'numArcsGE180', 'numArcsGE200', 'numArcsGE220', 'numArcsGE240', 'numArcsGE260', 'numArcsGE280', 'numArcsGE300', 
+                            'numArcsGE350', 'numArcsGE400', 'numArcsGE450', 'numArcsGE500', 'numArcsGE550', 'numArcsGE600', 'numDcoArcsGE000', 
+                            'numDcoArcsGE010', 'numDcoArcsGE020', 'numDcoArcsGE040', 'numDcoArcsGE050', 'numDcoArcsGE055', 'numDcoArcsGE060', 
+                            'numDcoArcsGE065', 'numDcoArcsGE070', 'numDcoArcsGE075', 'numDcoArcsGE080', 'numDcoArcsGE085', 'numDcoArcsGE090', 
+                            'numDcoArcsGE095', 'numDcoArcsGE100', 'numDcoArcsGE120', 'numDcoArcsGE140', 'numDcoArcsGE160', 'numDcoArcsGE180', 
+                            'numDcoArcsGE200', 'numDcoArcsGE220', 'numDcoArcsGE240', 'numDcoArcsGE260', 'numDcoArcsGE280', 'numDcoArcsGE300', 
+                            'numDcoArcsGE350', 'numDcoArcsGE400', 'numDcoArcsGE450', 'numDcoArcsGE500', 'numDcoArcsGE550', 'numDcoArcsGE600', 
+                            'badBulgeFitFlag', 'hasDeletedCtrClus', 'failed2revDuringMergeCheck', 'failed2revDuringSecondaryMerging', 
+                            'failed2revInOutput', 'star_mask_used', 'noise_mask_used'])
+    x = x.select_dtypes(include=np.number)
+    y = final["T"]
+
+    return x, y
