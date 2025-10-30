@@ -41,11 +41,20 @@ def evaluate(ypred, ytest, path):
     print(f"rmse: {root_mean_squared_error(ytest, ypred)}")
     print(f"r2: {r2_score(ytest, ypred)}")
 
-    plt.figure(figsize=(6,6))
-    plt.scatter(ytest, ypred, alpha=0.6, edgecolor='k')
-    plt.xlabel("Actual Values")
-    plt.ylabel("Predicted Values")
-    plt.grid(True)
+    fig, ax = plt.subplots(1, 2, figsize=(10, 4))
+    ax[0].scatter(ytest, ypred, alpha=0.3, edgecolor='k')
+    ax[0].set_xlabel("Actual Values")
+    ax[0].set_ylabel("Predicted Values")
+    ax[1].set_title('Predicted vs True T')
+    ax[0].grid(True)
+    
+    residuals = ytest - ypred
+    ax[1].scatter(ytest, residuals, alpha=0.3)
+    ax[1].set_xlabel('True T')
+    ax[1].set_ylabel('Residual (True - Pred)')
+    ax[1].set_title('Residuals vs True T')
+    ax[1].grid(True)
+    
     plt.savefig(path)
     plt.show()
 
@@ -61,14 +70,14 @@ def classify(ypred, ytest):
 
 def main(): 
     # run ↓ if you haven't loaded the txt files in or if you want to re-laod them 
-    # firstload("data\efigi-1.6\EFIGI_attributes.txt", "data\efigi-1.6\EFIGI_SDSS.txt",  "data\SDSS+SpArcFiRe_r+SFR.tsv")
+    firstload("data\efigi-1.6\EFIGI_attributes.txt", "data\efigi-1.6\EFIGI_SDSS.txt",  "data\SDSS+SpArcFiRe_r+SFR.tsv")
 
     # loading pkl files
     x, y = filter_merge("data/efigi_final.pkl", "data/sparcfire_outputs.pkl")
     
     '''
     # plotting distribution of T
-    y.hist()
+    y.hist(bins=20)
     plt.title('Histogram of T')
     plt.xlabel('Value')
     plt.ylabel('Frequency')
@@ -82,7 +91,7 @@ def main():
     ydata = y[mask]
     xdata = xdata.fillna(0)
 
-    xtrain, xtest, ytrain, ytest, rfmodel = model(xdata, ydata)
+    #xtrain, xtest, ytrain, ytest, rfmodel = model(xdata, ydata)
 
 if __name__ == "__main__":
     main()
