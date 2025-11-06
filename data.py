@@ -2,11 +2,11 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 import pickle
+import matplotlib.pyplot as plt
 
-def firstload(efigi1path, efigi2path, sdsspath):
+def first_load(efigi1path, efigi2path, sdsspath):
     efigi_1 = pd.concat([chunk for chunk in tqdm(pd.read_csv(efigi1path,  dtype={"objId": str}, comment="#", sep=r'\s+', na_values=["-1"], chunksize=100), desc='loading')])
     efigi_1.rename(columns={"PGCname": "PGC_name"}, inplace=True)
-    
     efigi_2 = pd.concat([chunk for chunk in tqdm(pd.read_csv(efigi2path,  dtype={"objId": str}, comment="#", sep=r'\s+', na_values=["none", "-99.99"], chunksize=100), desc='loading')])
 
     # merging the 2 efigi files based on the PGC name so that we have both T score and the sdss7 id together
@@ -16,6 +16,30 @@ def firstload(efigi1path, efigi2path, sdsspath):
     sparcfire_outputs = pd.concat([chunk for chunk in tqdm(pd.read_csv(sdsspath, sep=r'\t', chunksize=100) , desc='loading')])
     sparcfire_outputs.to_pickle("data/sparcfire_outputs.pkl")
 
+def basic_plots(x, y):
+    '''
+    # plotting distribution of T
+    y.hist(bins=19)
+    plt.xticks(range(-7, 13))
+    plt.title('Histogram of T')
+    plt.xlabel('Value')
+    plt.ylabel('Frequency')
+    plt.savefig("t_distribution.png")
+    plt.show()
+    '''
+
+    # plotting distribution of T
+
+    plt.scatter(y, x['spirality'])
+    plt.title('T vs. spirality')
+    plt.xlabel('T')
+    plt.ylabel('spirality (P_CW + P_ACW)')
+    plt.savefig("spirality_vs_t.png")
+    plt.show()
+
+    print(np.corrcoef(y, x['spirality']))
+
+
 def filter_merge(efigipklpath, sparcfirepklpath):
     with open(efigipklpath, 'rb') as file:
         efigi = pickle.load(file)
@@ -24,21 +48,13 @@ def filter_merge(efigipklpath, sparcfirepklpath):
 
     efigi["objId"] = efigi["objId"].dropna().astype(str)
     sparcfire["dr7objid"] = sparcfire["dr7objid"].astype(str)
+    #sparcfire["spirality"] = sparcfire["P_CW"] + sparcfire["P_ACW"]
     sparcfire.rename(columns={'dr7objid': 'objId'}, inplace=True)
     sparcfire = sparcfire[sparcfire["objId"].isin(efigi["objId"])]
     final = pd.merge(efigi, sparcfire, on="objId", how="inner")
 
     x = final.drop(columns=['T', 'T_inf', 'T_sup', 'objId', 'SpecObjId', 'SDSS_dr8objid', 'GZ_dr8objid', 'objID', 'badBulgeFitFlag', 
-                            'PGC_name', 'name', 'warnings', 'fit_state', 'numArcsGE000', 'numArcsGE010', 'numArcsGE020', 'numArcsGE040', 
-                            'numArcsGE050', 'numArcsGE055', 'numArcsGE060', 'numArcsGE065', 'numArcsGE070', 'numArcsGE075', 'numArcsGE080', 
-                            'numArcsGE085', 'numArcsGE090', 'numArcsGE095', 'numArcsGE100', 'numArcsGE120', 'numArcsGE140', 'numArcsGE160', 
-                            'numArcsGE180', 'numArcsGE200', 'numArcsGE220', 'numArcsGE240', 'numArcsGE260', 'numArcsGE280', 'numArcsGE300', 
-                            'numArcsGE350', 'numArcsGE400', 'numArcsGE450', 'numArcsGE500', 'numArcsGE550', 'numArcsGE600', 'numDcoArcsGE000', 
-                            'numDcoArcsGE010', 'numDcoArcsGE020', 'numDcoArcsGE040', 'numDcoArcsGE050', 'numDcoArcsGE055', 'numDcoArcsGE060', 
-                            'numDcoArcsGE065', 'numDcoArcsGE070', 'numDcoArcsGE075', 'numDcoArcsGE080', 'numDcoArcsGE085', 'numDcoArcsGE090', 
-                            'numDcoArcsGE095', 'numDcoArcsGE100', 'numDcoArcsGE120', 'numDcoArcsGE140', 'numDcoArcsGE160', 'numDcoArcsGE180', 
-                            'numDcoArcsGE200', 'numDcoArcsGE220', 'numDcoArcsGE240', 'numDcoArcsGE260', 'numDcoArcsGE280', 'numDcoArcsGE300', 
-                            'numDcoArcsGE350', 'numDcoArcsGE400', 'numDcoArcsGE450', 'numDcoArcsGE500', 'numDcoArcsGE550', 'numDcoArcsGE600', 
+                            'PGC_name', 'name', 'warnings', 'fit_state', 
                             'badBulgeFitFlag', 'hasDeletedCtrClus', 'failed2revDuringMergeCheck', 'failed2revDuringSecondaryMerging', 
                             'failed2revInOutput', 'star_mask_used', 'noise_mask_used'])
     x = x.select_dtypes(include=np.number)
