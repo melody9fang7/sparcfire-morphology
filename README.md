@@ -10,6 +10,8 @@ None of this data is included in this github repository. You can also find all t
 
 To load the data, you need to run **main()** in **predictor.py** with **firstload()** and the correct file paths for the data as parameters. If you download EFIGI on your own, you may need to delete the leading comma. **firstload()** will automatically merge the EFIGI files together, and **main()** automatically calls **filter_merge()** to merge the EFIGI and SpArcFiRe data for common galaxies only. You only need to call **firstload()** once, so comment it out once it's successfully run once.
 
+The final xdata and ydata are also available as xdata.csv and ydata.csv in /extra/wayne2/preserve/mkfang/sparcfire-morphology/data
+
 ## Requirements
 - Python
 - Dependencies:
